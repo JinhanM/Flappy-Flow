@@ -5,7 +5,7 @@ and pygame.
 
 Date created: Sep 2, 2020
 Author: JinhanM
-Reference: techwithtim
+Reference: techwithtim, clear-code-project
 """
 
 import pygame
