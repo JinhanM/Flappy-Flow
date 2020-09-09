@@ -8,7 +8,6 @@ Reference: techwithtim
 """
 
 import pygame
-import time
 import os
 import random
 import neat
@@ -16,6 +15,7 @@ import neat
 pygame.font.init()
 WIN_WIDTH = 500
 WIN_HEIGHT = 800
+GEN = 0
 
 BIRD_IMGS = [pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "bird1.png"))),
              pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "bird2.png"))),
@@ -167,14 +167,20 @@ class Base:
         win.blit(self.IMG, (self.x2, self.y))
 
 
-def draw_window(win, birds, pipes, base, score):
+def draw_window(win, birds, pipes, base, score, Gen):
     win.blit(BG_IMG, (0, 0))
 
     for pipe in pipes:
         pipe.draw(win)
 
     text = STAT_FONT.render("Score: " + str(score), 1, (255, 255, 255))
-    win.blit(text, (WIN_WIDTH - 10 - text.get_width(), 10))
+    win.blit(text, (WIN_WIDTH - 15 - text.get_width(), 15))
+
+    text_gen = STAT_FONT.render("Generation: " + str(Gen), 1, (255, 255, 255))
+    win.blit(text_gen, (10, 15))
+
+    survived_birds = STAT_FONT.render("# Birds Survived " + str(len(birds)), 1, (255, 255, 255))
+    win.blit(survived_birds, (10, 55))
     base.draw(win)
 
     for bird in birds:
@@ -184,6 +190,8 @@ def draw_window(win, birds, pipes, base, score):
 
 
 def main(genomes, config):
+    global GEN
+    GEN += 1
     nets = []
     ge = []
     birds = []
@@ -263,7 +271,7 @@ def main(genomes, config):
                 ge.pop(x)
 
         base.move()
-        draw_window(win, birds, pipes, base, score)
+        draw_window(win, birds, pipes, base, score, GEN)
 
 
 def run(config_path):
