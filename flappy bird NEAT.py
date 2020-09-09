@@ -26,6 +26,7 @@ BG_IMG = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "bg.png
 
 STAT_FONT = pygame.font.SysFont("comicsans", 50)
 
+
 class Bird:
     IMGS = BIRD_IMGS
     MAX_ROTATION = 25
@@ -166,9 +167,7 @@ class Base:
         win.blit(self.IMG, (self.x2, self.y))
 
 
-
-
-def draw_window(win, bird, pipes, base, score):
+def draw_window(win, birds, pipes, base, score):
     win.blit(BG_IMG, (0, 0))
 
     for pipe in pipes:
@@ -178,7 +177,9 @@ def draw_window(win, bird, pipes, base, score):
     win.blit(text, (WIN_WIDTH - 10 - text.get_width(), 10))
     base.draw(win)
 
-    bird.draw(win)
+    for bird in birds:
+        bird.draw(win)
+
     pygame.display.update()
 
 
@@ -220,7 +221,7 @@ def main(genomes, config):
 
         for x, bird in enumerate(birds):
             bird.move()
-            ge[x].fitness += 1
+            ge[x].fitness += 0.1
 
             output = nets[x].activate((bird.y, abs(bird.y - pipes[pipe_ind].height), abs(bird.y - pipes[pipe_ind].bottom)))
 
@@ -262,11 +263,7 @@ def main(genomes, config):
                 ge.pop(x)
 
         base.move()
-        draw_window(win, bird, pipes, base, score)
-
-
-
-
+        draw_window(win, birds, pipes, base, score)
 
 
 def run(config_path):
@@ -276,14 +273,13 @@ def run(config_path):
     p = neat.Population(config)
 
     p.add_reporter(neat.StdOutReporter(True))
-    stats = neat.StatisticsReporter
+    stats = neat.StatisticsReporter()
     p.add_reporter(stats)
 
-    winner = p.run(main(), 50)
+    winner = p.run(main, 50)
 
 
-
-if __name__ =='__main__':
+if __name__ == '__main__':
     local_dir = os.path.dirname(__file__)
     config_path = os.path.join(local_dir, "config-feedforward.txt")
     run(config_path)
