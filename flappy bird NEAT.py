@@ -11,6 +11,7 @@ import pygame
 import os
 import random
 import neat
+import pickle
 
 pygame.font.init()
 WIN_WIDTH = 500
@@ -274,6 +275,7 @@ def main(genomes, config):
         draw_window(win, birds, pipes, base, score, GEN)
 
 
+
 def run(config_path):
     config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet,
                                 neat.DefaultStagnation, config_path)
@@ -284,10 +286,32 @@ def run(config_path):
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
 
-    winner = p.run(main, 50)
+    winner = p.run(main, 20)
+
+    with open("best.pickle", "wb") as f:
+        pickle.dump(winner, f)
+        f.close()
+
+
+def replay_genome(config_path, genome_path):
+    # Load requried NEAT config
+    config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
+
+    # Unpickle saved winner
+    with open(genome_path, "rb") as f:
+        genome = pickle.load(f)
+
+    # Convert loaded genome into required data structure
+    genomes = [(1, genome)]
+
+    # Call game with only the loaded genome
+    main(genomes, config)
 
 
 if __name__ == '__main__':
     local_dir = os.path.dirname(__file__)
     config_path = os.path.join(local_dir, "config-feedforward.txt")
-    run(config_path)
+    # run(config_path)
+
+    model_path = os.path.join(local_dir, "best.pickle")
+    replay_genome(config_path, model_path)
